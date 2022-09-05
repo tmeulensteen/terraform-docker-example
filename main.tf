@@ -52,6 +52,15 @@ resource "docker_image" "db" {
   keep_locally = true
 }
 
+# Create networks
+resource "docker_network" "front-tier" {
+  name = "front-tier"
+}
+
+resource "docker_network" "back-tier" {
+  name = "back-tier"
+}
+
 
 # Create the containers
 resource "docker_container" "redis" {
@@ -62,12 +71,22 @@ resource "docker_container" "redis" {
     internal = "6379"
     external = "6379"
   }
+
+  networks_advanced {
+    name    = docker_network.back-tier.name
+    aliases = ["back-tier"]
+  }
 }
 
 resource "docker_container" "db" {
   image = docker_image.db.name
   name  = "db"
   env = ["POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres"]  
+
+  networks_advanced {
+    name    = docker_network.back-tier.name
+    aliases = ["back-tier"]
+  }  
 }
 
 resource "docker_container" "vote" {
@@ -83,11 +102,27 @@ resource "docker_container" "vote" {
     internal = 80
     external = 5000
   }
+
+  networks_advanced {
+    name    = docker_network.front-tier.name
+    aliases = ["front-tier"]
+  }
+
+  networks_advanced {
+    name    = docker_network.back-tier.name
+    aliases = ["back-tier"]
+  }
+
 }
 
 resource "docker_container" "worker" {
   image = docker_image.worker.name
   name  = "worker"
+
+  networks_advanced {
+    name    = docker_network.back-tier.name
+    aliases = ["back-tier"]
+  }
 }
 
 resource "docker_container" "result" {
@@ -106,5 +141,15 @@ resource "docker_container" "result" {
   ports {
     internal = 5858
     external = 5858
+  }
+
+  networks_advanced {
+    name    = docker_network.front-tier.name
+    aliases = ["front-tier"]
+  }
+
+  networks_advanced {
+    name    = docker_network.back-tier.name
+    aliases = ["back-tier"]
   }
 }
