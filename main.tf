@@ -96,7 +96,7 @@ resource "docker_container" "vote" {
   volumes {
     container_path  = "/app"
     read_only = false
-    host_path = "H:/sourcecontrol/terraform-docker-example/vote"
+    host_path = "C:/Users/Tom/Documents/sourcecontrol/terraform-docker-example/vote"
   }
   ports {
     internal = 80
@@ -132,7 +132,7 @@ resource "docker_container" "result" {
   volumes {
     container_path  = "/app"
     read_only = false
-    host_path = "H:/sourcecontrol/terraform-docker-example/result"
+    host_path = "C:/Users/Tom/Documents/sourcecontrol/terraform-docker-example/result"
   }
   ports {
     internal = 80
